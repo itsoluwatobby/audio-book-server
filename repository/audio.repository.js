@@ -7,6 +7,7 @@ class AudioRepository {
 
   async getAudioFiles(query = {}) {
     const audios = await AudioModel.find(query);
+    return audios;
   }
 
   async getAudio(audioId) {

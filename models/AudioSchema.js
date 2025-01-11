@@ -13,7 +13,7 @@ const AudioSchema = new mongoose.Schema(
     genre: { type: String, trim: true, required: [true, 'Genre is required'] },
     isPublic: { type: Boolean, default: true },
     likes: { type: Number, default: 0 },
-    disLikes: { type: Number, default: 0 },
+    rating: { type: Number, default: 0 },
     downloads: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
     note: { type: String, default: '' },

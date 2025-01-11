@@ -1,7 +1,7 @@
 const multer = require('multer');
 const express = require('express');
 const path = require('path');
-const audioServices = require('../service/audio.services');
+const { audioController } = require('../controller');
 
 const audioRoutes = express.Router();
 
@@ -27,27 +27,27 @@ const uploadFields = [
 
 audioRoutes.get(
   '/',
-  (req, res) => audioServices.getAudios(req, res),
+  (req, res, next) => audioController.getAudios(req, res, next),
 );
 
 audioRoutes.post(
   '/upload',
   upload.fields(uploadFields),
-  (req, res) => audioServices.uploadFile(req, res),
+  (req, res, next) => audioController.uploadFile(req, res, next),
 );
 
 audioRoutes.post(
   '/create',
-  (req, res) => audioServices.createAudio(req, res),
+  (req, res, next) => audioController.createAudio(req, res, next),
 );
 
 audioRoutes.get(
   '/file/:audioId',
-  (req, res) => audioServices.getAudioFile(req, res),
+  (req, res, next) => audioController.getAudioFile(req, res, next),
 );
 
 audioRoutes.get(
   '/stream/:fileName',
-  (req, res) => audioServices.streamAudio(req, res),
+  (req, res, next) => audioController.streamAudio(req, res, next),
 );
 module.exports = audioRoutes;

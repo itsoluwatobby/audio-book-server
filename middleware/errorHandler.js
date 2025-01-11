@@ -1,10 +1,11 @@
 const { StatusCodes, ReasonPhrases } = require('http-status-codes');
+const config = require('../config');
 
 function isCustomError(error) {
   return typeof error === 'object' && 'statusCode' in error;
 }
 
-exports.errorHandler = async (err, req, res, next) => {
+exports.errorHandler = (err, req, res, next) => {
   let errorObject = {};
   console.log(
     {
@@ -27,11 +28,11 @@ exports.errorHandler = async (err, req, res, next) => {
     && (err.type === 'entity.parse.failed' || err.name === 'SyntaxError')
   ) {
     errorObject.status = err?.statusCode || err?.status;
-    errorObject.name = ErrorNames.UNPROCESSABLEENTITYERROR;
+    errorObject.name = config.ErrorNames.UNPROCESSABLEENTITYERROR;
     errorObject.message = err.type === 'entity.parse.failed'
       ? 'Invalid JSON format in the request body. Please ensure there are no trailing commas.'
       : 'Syntax Error: Invalid data format.';
-    logger.error(`JSON parse error: ${err.message}. Request body: ${req.body}`);
+    console.error(`JSON parse error: ${err.message}. Request body: ${req.body}`);
   }
 
   // Fallback for unexpected errors

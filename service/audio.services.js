@@ -1,131 +1,107 @@
 const fs = require('fs');
-const audioRepository = require('../repository/audio.repository');
-// import path from 'path';
+const {
+  audioRepository,
+  chapterRepository,
+} = require('../repository');
+const {
+  throwServerError,
+  throwBadRequestError,
+  throwNotFoundError,
+} = require('../utils/throwErrors');
+const helper = require('../helpers/helper');
+const chapterServices = require('./chapter.services');
 
 class AudioServices {
+  async uploadFile(files, reqBody) {
+    const filename = files.audio[0].filename;
 
-  async uploadFile(req, res) {
-    try {
+    const { sessionId } = reqBody;
+    const chapter = helper.jsonParseValue(reqBody.chapter);
+    chapter.filename = filename;
 
-      console.log('File successfully uploaded');
-      const filename = req.files.audio ? req.files.audio[0].filename : req.files.thumbnail[0].filename;
-  
-      res.status(201).json(
-        {
-          statusCode: 201,
-          message: 'File successfully uploaded',
-          path: filename,
-        }
-      );
-    } catch (error) {
-      console.log('error uploading file ', error.massage)
-      res.status(406).json({ statusCode: 406, message: error.message });
-    }
-  }
-  
-  async createAudio(req, res) {
-    try {
-      console.log('Creating audio file');
-
-      const audio = await audioRepository.getAudio(req.body);
-      if (!audio) return res.status(404).json(
-        { statusCode: 400, message: 'Error creating audio' },
-      );
-  
-      res.status(201).json(
-        {
-          statusCode: 201,
-          message: 'File successfully created',
-          audio,
-        }
-      );
-    } catch (error) {
-      console.log('error uploading file ', error.massage);
-      res.status(406).json({ statusCode: 406, message: error.message });
-    }
+    const result = await chapterRepository.createChapter(sessionId, chapter);
+    if (!result) throwBadRequestError('Error creating chapter');
+    
+    console.log('File successfully uploaded');
+    
+    return result;
   }
 
-  async getAudioFile(req, res) {
-    try {
-      console.log('Getting audio file');
-      const audioId = req.params.audioId;
+  async uploadThumbnail(files, reqBody) {
+    console.log('File successfully uploaded');
+    const filename = files.thumbnail[0].filename;
+    
+    // const chapter = await chapterRepository.createChapter(
+    //   { ...reqBody, chapter: { ...reqBody.chapter, filename } },
+    // );
+    // if (!chapter) throwBadRequestError('Error creating chapter');
+    
+    return filename;
+  }
   
-      const audio = await audioRepository.getAudio(audioId);
-      if (!audio) return res.status(404).json(
-        {
-          statusCode: 404,
-          message: 'Audio not found',
-        }
-      );
-  
-      res.status(200).json(
-        {
-          statusCode: 200,
-          message: 'File successfully retrieved',
-          audio,
-        }
-      );
-    } catch (error) {
-      console.log('error retrieving file ', error.massage);
-      res.status(406).json({ statusCode: 406, message: error.message });
-    }
+  async createAudio(body) {
+    console.log('Creating audio file and update chapter with audioId');
+
+    const { sessionId, ...rest } = body;
+    const audio = await audioRepository.createAudio(rest);
+    if (!audio) throwBadRequestError('Error creating audio');
+
+    const chapter = await chapterRepository.updateChapterWithAudioId(sessionId, audio.id);
+    if (!chapter) throwBadRequestError('Error updating chapter with audioId');
+    
+    return audio;
+  }
+
+  async getAudioFile(params) {
+    console.log('Getting audio file');
+
+    const audio = await audioRepository.getAudio(params.audioId);
+    if (!audio) throwNotFoundError('Audio not found');
+
+    return audio
   }
  
-  async getAudios(req, res) {
-    try {
-      console.log('Getting audio files');
-  
-      const audios = await audioRepository.getAudioFiles({});
-  
-      res.status(200).json(
-        {
-          statusCode: 200,
-          message: 'File successfully uploaded',
-          data: audios,
-        }
-      );
-    } catch (error) {
-      console.log('error retrieving file ', error.massage);
-      res.status(406).json({ statusCode: 406, message: error.message });
-    }
+  async getAudios() {
+    console.log('Getting audio files');
+    const audios = await audioRepository.getAudioFiles({});
+
+    return audios;
   }
 
   async streamAudio(req, res) {
-    const fileName = req.params.fileName;
     console.log(`Stream Audio with audioId ${fileName}`);
-    try {
-      const path = 'uploads/' + fileName;
-      const stat = fs.statSync(path);
-      const fileSize = stat.size;
-      const range = req.headers.range;
+    
+    const fileName = req.params.fileName
+    const path = 'uploads/audio/' + fileName;
 
-      if (range) {
-        const parts = range.replace(/bytes=/, "").split("-");
-        const start = parseInt(parts[0], 10);
-        const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1;
+    const stat = fs.statSync(path);
+    
+    const fileSize = stat.size;
+    const range = req.headers.range;
 
-        const chunksize = (end-start)+1;
-        const file = fs.createReadStream(path, {start, end});
-        const head = {
-          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-          'Accept-Ranges': 'bytes',
-          'Content-Length': chunksize,
-          'Content-Type': 'audio/mpeg',
-        };
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1;
 
-        res.writeHead(206, head);
-        file.pipe(res);
-      } else {
-        const head = {
-          'Content-Length': fileSize,
-          'Content-Type': 'audio/mpeg',
-        };
-        res.writeHead(200, head);
-        fs.createReadStream(path).pipe(res);
-      }
-    } catch (error) {
-      console.log(error.message);
-      res.status(406).json({ statusCode: 406, message: error.message });
+      const chunksize = (end-start)+1;
+      const file = fs.createReadStream(path, {start, end});
+      const head = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': 'audio/mpeg',
+      };
+
+      res.writeHead(206, head);
+      file.pipe(res);
+    } else {
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': 'audio/mpeg',
+      };
+      res.writeHead(200, head);
+      fs.createReadStream(path).pipe(res);
     }
   }
 }

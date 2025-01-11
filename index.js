@@ -6,36 +6,38 @@ const cors = require('cors');
 const morgan = require('morgan');
 const { CorsOption } = require('./config/corsOptions');
 const { DBConnection } = require('./config/DBConnect');
-const audioRoutes = require('./routes/audio.roues');
+const { chapterRoutes, audioRoutes } = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
+const { responseBody } = require('./utils/responseBody');
 
 DBConnection();
 
 const app = express();
 const server = http.createServer(app);
 
+app.use(express.static('uploads/thumbnails'));
 app.use(express.json());
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('common'));
 app.use(cors(CorsOption));
 // app.use()
 
 app.get('/health', (_, res) => {
-  res.status(200).json(
+  responseBody(
     {
+      res,
       statusCode: 200,
       message: 'Server is in good health',
-      timestamp: new Date().toString(),
       data: {
         status: true,
       }
     }
-  )
+  );
 });
 
-app.use('/api/v1', audioRoutes);
+app.use('/api/v1/audio', audioRoutes);
+app.use('/api/v1/chapter', chapterRoutes);
 
 app.all('*', routeNotFound);
 app.use(errorHandler);

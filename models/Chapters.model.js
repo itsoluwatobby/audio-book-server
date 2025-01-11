@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const Chapter = {
-  chapter: { type: Number, default: 1 },
+const Episode = {
+  episode: { type: Number, default: 1 },
   link: { type: String },
   filename: { type: String },
   duration: { type: String },
@@ -17,7 +17,7 @@ const ChapterSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'audios',
     },
-    chapters: [Chapter],
+    chapters: [Episode],
   },
   { timestamps: true },
 );
