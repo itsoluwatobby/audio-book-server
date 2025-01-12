@@ -1,17 +1,22 @@
 const { ChapterModel } = require("../models");
-const { throwNotFoundError, throwUnprocessableEntityError } = require("../utils/throwErrors");
+const { throwNotFoundError, throwUnprocessableEntityError, throwServerError } = require("../utils/throwErrors");
 const fs = require('fs');
 
 class ChapterRepository {
   async createChapter(sessionId, chapter) {
-    const findChapter = await this.getChapterBySessionId(sessionId)
-    if (findChapter) {
-      chapter.episode = 1 + findChapter.chapters?.length;
-      findChapter.chapters.push(chapter);
-      await findChapter.save();
-      return findChapter;
+    try {
+      const findChapter = await this.getChapterBySessionId(sessionId)
+      if (findChapter) {
+        if (!chapter.episode) chapter.episode = 1 + findChapter.chapters?.length;
+        findChapter.chapters.push(chapter);
+        await findChapter.save();
+        return findChapter;
+      }
+      return ChapterModel.create({ sessionId, chapters: [chapter] });
+    } catch (err) {
+      await this.deleteFile('audio', chapter.filename);
+      throwServerError(err.message);
     }
-    return ChapterModel.create({ sessionId, chapters: [chapter] });
   }
 
   async getChapters(query = {}) {
@@ -44,7 +49,7 @@ class ChapterRepository {
 
     return ChapterModel.findOneAndUpdate(
       { sessionId: sessionId },
-      { chapters: { $pull: { episodeId } } },
+      { $pull: { chapters: { _id: episodeId } } },
       { new: true },
     )
   }
@@ -54,7 +59,7 @@ class ChapterRepository {
     const filePath = `uploads/${path}/${filename}`;
     fs.unlink(filePath, (err) => {
       if (err) {
-        const msg = 'Error deleting chapter episode';
+        const msg = `Error deleting chapter ${path}`;
         console.log(msg);
         throwUnprocessableEntityError(msg);
       }
@@ -62,16 +67,16 @@ class ChapterRepository {
     console.log(`Chapter with name ${filename} removed`);
   }
   
-  async updateChapterWithAudioId(sessionId, audioId) {
+  async updateChapterWithAudioId(chapterId, audioId) {
     return ChapterModel.findOneAndUpdate(
-      { sessionId: sessionId },
+      { _id: chapterId },
       { audioId },
       { new: true },
     )
   }
 
   async deleteAudioChapter(chapterId) {
-    return ChapterModel.deleteOne({ id: chapterId });
+    return ChapterModel.delete({ id: chapterId });
   }
 }
 module.exports = new ChapterRepository();

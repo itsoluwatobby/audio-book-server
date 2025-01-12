@@ -6,7 +6,11 @@ const cors = require('cors');
 const morgan = require('morgan');
 const { CorsOption } = require('./config/corsOptions');
 const { DBConnection } = require('./config/DBConnect');
-const { chapterRoutes, audioRoutes } = require('./routes');
+const {
+  chapterRoutes,
+  appConfigRoutes,
+  audioRoutes,
+} = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
 const { responseBody } = require('./utils/responseBody');
@@ -38,6 +42,7 @@ app.get('/health', (_, res) => {
 
 app.use('/api/v1/audio', audioRoutes);
 app.use('/api/v1/chapter', chapterRoutes);
+app.use('/api/v1/config', appConfigRoutes);
 
 app.all('*', routeNotFound);
 app.use(errorHandler);

@@ -8,7 +8,7 @@ const audioRoutes = express.Router();
 const storage = multer.diskStorage(
   {
     destination: function(_, file, cb) {
-      if (file.fieldname === 'thumbnail') cb(null, 'uploads/thumbnails/')
+      if (file.fieldname === 'thumbnail') cb(null, 'uploads/thumbnail/')
       else if (file.fieldname === 'audio') cb(null, 'uploads/audio/');
       else cb(new Error('Invalid file type'));
     },
@@ -37,6 +37,7 @@ audioRoutes.post(
 
 audioRoutes.post(
   '/create',
+  upload.fields(uploadFields),
   (req, res, next) => audioController.createAudio(req, res, next),
 );
 
@@ -46,7 +47,7 @@ audioRoutes.get(
 );
 
 audioRoutes.get(
-  '/stream/:fileName',
+  '/stream/:filename',
   (req, res, next) => audioController.streamAudio(req, res, next),
 );
 

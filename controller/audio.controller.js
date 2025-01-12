@@ -54,9 +54,9 @@ class AudioController {
     }
   }
   
-  async getAudios(_req, res, next) {
+  async getAudios(req, res, next) {
     try {
-      const data = await audioServices.getAudios();
+      const data = await audioServices.getAudios(req.query);
 
       responseBody(
         {
