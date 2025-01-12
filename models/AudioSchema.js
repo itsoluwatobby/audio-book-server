@@ -4,7 +4,7 @@ const AudioSchema = new mongoose.Schema(
   {
     title: { type: String, trim: true, required: [true, 'Audio title is required'] },
     author: { type: String, trim: true, required: [true, 'Audio author is required'] },
-    chapters: {
+    chapterId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'chapters',
     },

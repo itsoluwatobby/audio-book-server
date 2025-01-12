@@ -1,4 +1,4 @@
-const ChapterModel = require("../models/Chapters.model");
+const { ChapterModel } = require("../models");
 const { throwNotFoundError, throwUnprocessableEntityError } = require("../utils/throwErrors");
 const fs = require('fs');
 
@@ -39,7 +39,19 @@ class ChapterRepository {
     const chapter = await this.getChapterBySessionId(sessionId);
     const episode = chapter.chapters.find((chap) => chap.id === episodeId);
     if (!episode) throwNotFoundError('Episode not found');
-    const filePath = `uploads/audio/${episode.filename}`;
+    
+    await this.deleteFile('audio', episode.filename);
+
+    return ChapterModel.findOneAndUpdate(
+      { sessionId: sessionId },
+      { chapters: { $pull: { episodeId } } },
+      { new: true },
+    )
+  }
+
+  async deleteFile(path, filename) {
+    if (!filename) return;
+    const filePath = `uploads/${path}/${filename}`;
     fs.unlink(filePath, (err) => {
       if (err) {
         const msg = 'Error deleting chapter episode';
@@ -47,11 +59,7 @@ class ChapterRepository {
         throwUnprocessableEntityError(msg);
       }
     });
-    return ChapterModel.findOneAndUpdate(
-      { sessionId: sessionId },
-      { chapters: { $pull: { episodeId } } },
-      { new: true },
-    )
+    console.log(`Chapter with name ${filename} removed`);
   }
   
   async updateChapterWithAudioId(sessionId, audioId) {

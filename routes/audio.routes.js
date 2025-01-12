@@ -24,7 +24,6 @@ const uploadFields = [
   { name: 'thumbnail', maxCount: 1 },
 ]
 
-
 audioRoutes.get(
   '/',
   (req, res, next) => audioController.getAudios(req, res, next),
@@ -49,5 +48,10 @@ audioRoutes.get(
 audioRoutes.get(
   '/stream/:fileName',
   (req, res, next) => audioController.streamAudio(req, res, next),
+);
+
+audioRoutes.delete(
+  '/delete/:audioId',
+  (req, res, next) => audioController.deleteAudio(req, res, next),
 );
 module.exports = audioRoutes;

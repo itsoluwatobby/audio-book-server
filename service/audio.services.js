@@ -26,29 +26,22 @@ class AudioServices {
     
     return result;
   }
-
-  async uploadThumbnail(files, reqBody) {
-    console.log('File successfully uploaded');
+  
+  async createAudio(body, files) {
+    console.log('Creating audio file and update chapter with audioId');
+    
     const filename = files.thumbnail[0].filename;
     
-    // const chapter = await chapterRepository.createChapter(
-    //   { ...reqBody, chapter: { ...reqBody.chapter, filename } },
-    // );
-    // if (!chapter) throwBadRequestError('Error creating chapter');
-    
-    return filename;
-  }
-  
-  async createAudio(body) {
-    console.log('Creating audio file and update chapter with audioId');
-
     const { sessionId, ...rest } = body;
-    const audio = await audioRepository.createAudio(rest);
+    const audio = await audioRepository.createAudio({ ...rest, thumbnail: filename });
     if (!audio) throwBadRequestError('Error creating audio');
 
     const chapter = await chapterRepository.updateChapterWithAudioId(sessionId, audio.id);
     if (!chapter) throwBadRequestError('Error updating chapter with audioId');
     
+    audio.chapterId = chapter.id;
+    await audio.save();
+
     return audio;
   }
 
@@ -57,7 +50,7 @@ class AudioServices {
 
     const audio = await audioRepository.getAudio(params.audioId);
     if (!audio) throwNotFoundError('Audio not found');
-
+    
     return audio
   }
  
@@ -66,6 +59,24 @@ class AudioServices {
     const audios = await audioRepository.getAudioFiles({});
 
     return audios;
+  }
+  
+  async deleteAudio(audioId) {
+    console.log('Removing audio files');
+    
+    const audio = await audioRepository.getAudio(audioId);
+    if (!audio) throwNotFoundError('Audio not found');
+
+    const chapter = await chapterRepository.getChapter(audio.chapterId);
+    await Promise.allSettled(chapter.chapters.map(async (chap) => {
+      await chapterRepository.deleteFile('audio', chap?.filename);
+    }));
+    await chapterRepository.deleteFile('thumbnails', audio?.thumbnail);
+
+    await chapterRepository.deleteAudioChapter(chapter.id);
+    await audioRepository.deleteAudio(audio.id);
+
+    return { id: audio.id };
   }
 
   async streamAudio(req, res) {

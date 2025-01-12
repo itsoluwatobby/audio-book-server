@@ -1,4 +1,4 @@
-const AudioModel = require("../models/AudioSchema");
+const { AudioModel } = require("../models");
 
 class AudioRepository {
   async createAudio(newAudio) {

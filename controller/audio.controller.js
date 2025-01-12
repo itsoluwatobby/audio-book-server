@@ -22,7 +22,7 @@ class AudioController {
   
   async createAudio(req, res, next) {
     try {
-      const data = await audioServices.createAudio(req.body);
+      const data = await audioServices.createAudio(req.body, req.files);
 
       responseBody(
         {
@@ -71,20 +71,21 @@ class AudioController {
     }
   }
   
-  // async streamAudio(req, res, next) {
-  //   try {
-  //     const data = await audioServices.streamAudio(req.params, req.headers);
-  //     responseBody(
-  //       {
-  //         res,
-  //         statusCode: StatusCodes.CREATED,
-  //         message: 'File successfully uploaded',
-  //         data,
-  //       }
-  //     )
-  //   } catch (error) {
-  //     next(error)
-  //   }
-  // }
+  async deleteAudio(req, res, next) {
+    try {
+      const data = await audioServices.deleteAudio(req.params.audioId);
+      
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.CREATED,
+          message: 'Audio successfully deleted',
+          data,
+        }
+      )
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 module.exports = new AudioController();
