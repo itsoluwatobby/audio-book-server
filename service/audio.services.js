@@ -101,13 +101,15 @@ class AudioServices {
     if (!audio) throwNotFoundError('Audio not found');
 
     const chapter = await chapterRepository.getChapter(audio.chapterId);
-    await Promise.allSettled(chapter.chapters.map(async (chap) => {
-      await chapterRepository.deleteFile('audio', chap?.filename);
-    }));
-    await chapterRepository.deleteFile('thumbnail', audio?.thumbnail);
+    if (chapter) {
+      await Promise.allSettled(chapter.chapters.map(async (chap) => {
+        await chapterRepository.deleteFile('audio', chap?.filename);
+      }));
+      await chapter.deleteOne();
+    }
 
-    await chapterRepository.deleteAudioChapter(chapter.id);
-    await audioRepository.deleteAudio(audio.id);
+    await chapterRepository.deleteFile('thumbnail', audio?.thumbnail);
+    await audio.deleteOne();
 
     return { id: audio.id };
   }

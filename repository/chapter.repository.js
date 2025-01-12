@@ -57,6 +57,8 @@ class ChapterRepository {
   async deleteFile(path, filename) {
     if (!filename) return;
     const filePath = `uploads/${path}/${filename}`;
+    if (!fs.existsSync(filePath)) return;
+  
     fs.unlink(filePath, (err) => {
       if (err) {
         const msg = `Error deleting chapter ${path}`;
@@ -76,7 +78,7 @@ class ChapterRepository {
   }
 
   async deleteAudioChapter(chapterId) {
-    return ChapterModel.delete({ id: chapterId });
+    return ChapterModel.deleteOne({ id: chapterId });
   }
 }
 module.exports = new ChapterRepository();
