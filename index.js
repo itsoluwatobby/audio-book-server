@@ -20,7 +20,7 @@ DBConnection();
 const app = express();
 const server = http.createServer(app);
 
-app.use(express.static('uploads/thumbnails'));
+app.use(express.static('uploads/thumbnail'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('common'));

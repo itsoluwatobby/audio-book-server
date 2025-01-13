@@ -15,4 +15,8 @@ chapterRoutes.get(
   '/stream/:sessionId',
   (req, res, next) => chapterController.getChapter(req, res, next),
 );
+chapterRoutes.get(
+  '/:chapterId',
+  (req, res, next) => chapterController.getChapterById(req, res, next),
+);
 module.exports = chapterRoutes;

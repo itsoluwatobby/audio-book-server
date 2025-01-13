@@ -25,6 +25,17 @@ class ChapterServices {
 
     return chapter;
   }
+  
+  async getChapterById(chapterId) {
+    console.log('Getting audio chapter');
+    const validatorResponse = chapterValidators.idValidator({ chapterId }, 'chapterId');
+    if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
+
+    const chapter = await chapterRepository.getChapter(chapterId);
+    if (!chapter) throwNotFoundError('Chapter not found');
+
+    return chapter;
+  }
  
   async getChapters() {
     console.log('Getting chapters');

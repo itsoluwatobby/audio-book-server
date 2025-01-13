@@ -35,6 +35,22 @@ class ChapterController {
       next(error)
     }
   }
+ 
+  async getChapterById(req, res, next) {
+    try {
+      const data = await chapterServices.getChapterById(req.params.chapterId);
+
+      responseBody(
+        {
+          res,
+          message: 'Chapter successfully retrieved',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
   
   async getChapters(_req, res, next) {
     try {

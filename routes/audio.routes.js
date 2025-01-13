@@ -2,6 +2,7 @@ const multer = require('multer');
 const express = require('express');
 const path = require('path');
 const { audioController } = require('../controller');
+const { audioServices } = require('../service');
 
 const audioRoutes = express.Router();
 
@@ -48,7 +49,7 @@ audioRoutes.get(
 
 audioRoutes.get(
   '/stream/:filename',
-  (req, res, next) => audioController.streamAudio(req, res, next),
+  (req, res, next) => audioServices.streamAudio(req, res, next),
 );
 
 audioRoutes.delete(
