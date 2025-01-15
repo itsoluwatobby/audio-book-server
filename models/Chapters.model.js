@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const Episode = {
-  episode: { type: Number, unique: [true, 'episode sequence must be unique'], default: 1 },
+  episode: { type: Number, default: 1 },
   link: { type: String },
   filename: { type: String },
   duration: { type: String },

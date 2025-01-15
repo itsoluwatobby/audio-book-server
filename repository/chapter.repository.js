@@ -42,7 +42,7 @@ class ChapterRepository {
   
   async removeEpisodeFromChapter(sessionId, episodeId) {
     const chapter = await this.getChapterBySessionId(sessionId);
-    const episode = chapter.chapters.find((chap) => chap.id === episodeId);
+    const episode = chapter.chapters?.find((chap) => chap.id === episodeId);
     if (!episode) throwNotFoundError('Episode not found');
     
     await this.deleteFile('audio', episode.filename);
@@ -62,7 +62,6 @@ class ChapterRepository {
     fs.unlink(filePath, (err) => {
       if (err) {
         const msg = `Error deleting chapter ${path}`;
-        console.log(msg);
         throwUnprocessableEntityError(msg);
       }
     });
