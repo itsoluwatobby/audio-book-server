@@ -51,7 +51,7 @@ class AudioServices {
     }
 
     rest.thumbnail = filename;
-    
+
     const audio = await audioRepository.createAudio(rest);
     if (!audio) {
       await chapterRepository.deleteFile('thumbnail', filename);
