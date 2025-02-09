@@ -17,5 +17,20 @@ class AppConfigValidator {
       error: validatorResponse.error?.message,
     };
   }
+  
+  passwordValidator = (data) => {
+    const passwordSchema = Joi.object(
+      {
+        email: Joi.string().email().required(),
+        password: Joi.string().required(),
+      },
+    );
+  
+    const validatorResponse = passwordSchema.validate(data);
+    return {
+      valid: !validatorResponse.error,
+      error: validatorResponse.error?.message,
+    };
+  }
 }  
-module.exports = new AppConfigValidator()
+module.exports = new AppConfigValidator();

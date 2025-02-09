@@ -7,12 +7,24 @@ appConfigRoutes.get(
   '/',
   (req, res, next) => appConfigController.getAppConfig(req, res, next),
 );
+
 appConfigRoutes.post(
   '/',
   (req, res, next) => appConfigController.setupAppConfig(req, res, next),
 );
+
 appConfigRoutes.put(
   '/',
   (req, res, next) => appConfigController.updateAppConfig(req, res, next),
+);
+
+appConfigRoutes.post(
+  '/setup',
+  (req, res, next) => appConfigController.addPassword(req, res, next),
+);
+
+appConfigRoutes.post(
+  '/login',
+  (req, res, next) => appConfigController.login(req, res, next),
 );
 module.exports = appConfigRoutes;

@@ -35,6 +35,38 @@ class AppConfigController {
       next(error)
     }
   }
+
+  async addPassword(req, res, next) {
+    try {
+      const data = await appConfigServices.addPassword(req.body);
+
+      responseBody(
+        {
+          res,
+          message: 'App configuration password successfully setup',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
+  
+  async login(req, res, next) {
+    try {
+      const data = await appConfigServices.login(req.body);
+
+      responseBody(
+        {
+          res,
+          message: 'App configuration login credential confirmed',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
   
   async updateAppConfig(req, res, next) {
     try {

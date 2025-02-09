@@ -14,6 +14,7 @@ const {
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
 const { responseBody } = require('./utils/responseBody');
+const { appConfigServices } = require('./service');
 
 DBConnection();
 
@@ -50,6 +51,7 @@ app.use(errorHandler);
 mongoose.connection.once('open', () => {
   server.listen(config.PORT, () => {
     console.log(`Server running on PORT - ${config.PORT}`);
+    appConfigServices.initiateSetup();
   });
 });
 

@@ -6,8 +6,8 @@ class AppConfigRepository {
     return AppConfigModel.create({ ...newAppConfig, appId: config.appId });
   }
 
-  async getAppConfig() {
-    return AppConfigModel.findOne({ appId: config.appId });
+  async getAppConfig(withPassword = false) {
+    return AppConfigModel.findOne({ appId: config.appId }).select(withPassword ? '+password' : '-password');
   }
 
   async editAppConfig(updatedInfo) {
