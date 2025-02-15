@@ -67,6 +67,22 @@ class AppConfigController {
       next(error)
     }
   }
+
+  async logout(_req, res, next) {
+    try {
+      const data = await appConfigServices.logout();
+
+      responseBody(
+        {
+          res,
+          message: 'Logout successful',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
   
   async updateAppConfig(req, res, next) {
     try {

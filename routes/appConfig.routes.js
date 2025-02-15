@@ -27,4 +27,9 @@ appConfigRoutes.post(
   '/login',
   (req, res, next) => appConfigController.login(req, res, next),
 );
+
+appConfigRoutes.post(
+  '/logout',
+  (req, res, next) => appConfigController.logout(req, res, next),
+);
 module.exports = appConfigRoutes;

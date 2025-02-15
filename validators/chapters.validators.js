@@ -35,5 +35,20 @@ class ChapterValidator {
       error: validatorResponse.error?.message,
     };
   }
+  
+  audioRatingValidator = (data) => {
+    const audioRatingSchema = Joi.object(
+      {
+        audioId: Joi.string().required(),
+        rating: Joi.number().min(0).max(5).required(),
+      },
+    );
+  
+    const validatorResponse = audioRatingSchema.validate(data);
+    return {
+      valid: !validatorResponse.error,
+      error: validatorResponse.error?.message,
+    };
+  }
 }  
 module.exports = new ChapterValidator()

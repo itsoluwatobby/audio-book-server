@@ -56,4 +56,19 @@ audioRoutes.delete(
   '/delete/:audioId',
   (req, res, next) => audioController.deleteAudio(req, res, next),
 );
+
+audioRoutes.patch(
+  '/like/:audioId',
+  (req, res, next) => audioController.likeAudiobook(req, res, next),
+);
+
+audioRoutes.put(
+  '/rate',
+  (req, res, next) => audioController.rateAudio(req, res, next),
+);
+
+audioRoutes.get(
+  '/user',
+  (req, res, next) => audioController.getCurrentUser(req, res, next),
+);
 module.exports = audioRoutes;

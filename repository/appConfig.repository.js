@@ -7,7 +7,12 @@ class AppConfigRepository {
   }
 
   async getAppConfig(withPassword = false) {
-    return AppConfigModel.findOne({ appId: config.appId }).select(withPassword ? '+password' : '-password');
+    return AppConfigModel.findOne({ appId: config.appId })
+      .select(
+        withPassword
+        ? '+password +isLoggedIn +sessionId +email'
+        : '-password -isLoggedIn -sessionId -email',
+      );
   }
 
   async editAppConfig(updatedInfo) {

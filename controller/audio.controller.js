@@ -36,10 +36,74 @@ class AudioController {
       next(error)
     }
   }
+
+  async rateAudio(req, res, next) {
+    try {
+      const data = await audioServices.rateAudio(
+        {
+          ...req.body,
+          ipAddress: req.ip,
+        },
+      );
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.ACCEPTED,
+          message: 'Audio rating completed',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async likeAudiobook(req, res, next) {
+    try {
+      const data = await audioServices.likeAudiobook(
+        {
+          ...req.params,
+          ipAddress: req.ip,
+        },
+      );
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.CREATED,
+          message: 'Audio successfully created',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
+  async getCurrentUser(req, res, next) {
+    try {
+      const data = await audioServices.getCurrentUser(req.ip);
+
+      responseBody(
+        {
+          res,
+          message: 'User retrieved',
+          data,
+        },
+      );
+    } catch (error) {
+      next(error)
+    }
+  }
   
   async getAudioFile(req, res, next) {
     try {
-      const data = await audioServices.getAudioFile(req.params);
+      const data = await audioServices.getAudioFile(
+        {
+          ...req.params,
+          ipAddress: req.ip,
+        },
+      );
 
       responseBody(
         {

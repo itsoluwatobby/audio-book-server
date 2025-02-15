@@ -1,5 +1,6 @@
 const { appConfigRepository } = require('../repository');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const {
   throwNotFoundError,
   throwServerError,
@@ -7,7 +8,6 @@ const {
   throwForbiddenError,
 } = require('../utils/throwErrors');
 const { appConfigValidators } = require('../validators');
-const config = require('../config');
 
 class AppConfigServices {
   
@@ -43,17 +43,18 @@ class AppConfigServices {
     console.log('Setting up appConfig password');
     const validatorResponse = appConfigValidators.passwordValidator(reqBody);
     if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
-
-    if (appConfig.email !== reqBody.email) return throwForbiddenError('Unauthorized access');
     
-    const appConfig = await appConfigRepository.getAppConfig();
-    if (!appConfig) throwConflictError('App Config already completed');
+    const appConfig = await appConfigRepository.getAppConfig(true);
+    if (!appConfig) throwConflictError('App Config not found');
+    
+    if (appConfig.email !== reqBody.email) return throwForbiddenError('Unauthorized access');
 
     const hashedPassword = await bcrypt.hash(reqBody.password, 10);
     appConfig.password = hashedPassword;
     await appConfig.save();
 
-    return appConfig;
+    const { password, ...rest } = appConfig._doc;
+    return rest;
   }
 
   async login(reqBody) {
@@ -70,9 +71,24 @@ class AppConfigServices {
     if (!match) throwForbiddenError('Bad credentials');
 
     appConfig.isLoggedIn = true;
+    appConfig.sessionId = crypto.randomBytes(16).toString('hex');
     await appConfig.save();
 
-    const { password, ...rest } = appConfig;
+    const { password, ...rest } = appConfig._doc;
+    return rest;
+  }
+  
+  async logout() {
+    console.log('Logging user out...');
+    
+    const appConfig = await appConfigRepository.getAppConfig(true);
+    if (!appConfig) throwConflictError('App Config not found');
+    
+    appConfig.isLoggedIn = false;
+    appConfig.sessionId = null;
+    await appConfig.save();
+
+    const { password, ...rest } = appConfig._doc;
     return rest;
   }
 
