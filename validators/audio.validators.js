@@ -4,9 +4,16 @@ class AudioValidator {
   uploadAudioValidator = (data) => {
     const uploadAudioValidatorSchema = Joi.object(
       {
-        chapter: Joi.object({ duration: Joi.string().required() }).required(),
+        chapter: Joi.object(
+          {
+            episode: Joi.number().min(0).required(),
+            duration: Joi.string().required(),
+            publicId: Joi.string().required(),
+            filename: Joi.string().required(),
+            link: Joi.string().required(),
+          },
+        ).required(),
         sessionId: Joi.string().required(),
-        episode: Joi.number().min(0).required(),
       },
     );
   
@@ -21,6 +28,7 @@ class AudioValidator {
     const createAudioSchema = Joi.object(
       {
         chapterId: Joi.string().required(),
+        thumbnail: Joi.string().required(),
         author: Joi.string().required(),
         genre: Joi.array().min(1).items(Joi.string().required()).required(),
         note: Joi.string().allow(null),

@@ -2,6 +2,7 @@ const { appConfigRepository } = require('../repository');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const {
+  throwBadRequestError,
   throwNotFoundError,
   throwServerError,
   throwConflictError,

@@ -5,7 +5,7 @@ const { responseBody } = require("../utils/responseBody");
 class AudioController {
   async uploadFile(req, res, next) {
     try {
-      const data = await audioServices.uploadFile(req.files, req.body);
+      const data = await audioServices.uploadFile(req.body);
       
       responseBody(
         {
@@ -22,7 +22,7 @@ class AudioController {
   
   async createAudio(req, res, next) {
     try {
-      const data = await audioServices.createAudio(req.body, req.files);
+      const data = await audioServices.createAudio(req.body);
 
       responseBody(
         {

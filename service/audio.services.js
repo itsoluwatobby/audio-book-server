@@ -7,28 +7,23 @@ const {
   throwBadRequestError,
   throwNotFoundError,
 } = require('../utils/throwErrors');
-const helper = require('../helpers/helper');
 const {
   audioValidators,
   chapterValidators,
 } = require('../validators');
+// import config from '../config';
 
 class AudioServices {
-  async uploadFile(files, reqBody) {
-    const filename = files.audio[0].filename;
-
+  async uploadFile(reqBody) {
     const { sessionId } = reqBody;
-    const chapter = helper.jsonParseValue(reqBody.chapter);
 
-    const validatorResponse = audioValidators.uploadAudioValidator({ ...reqBody, chapter });
+    const validatorResponse = audioValidators.uploadAudioValidator(reqBody);
     if (validatorResponse.error) {
-      await chapterRepository.deleteFile('audio', filename);
+      await chapterRepository.deleteFile(reqBody.chapter.publicId);
       return throwBadRequestError(validatorResponse.error);
     }
 
-    chapter.filename = filename;
-
-    const result = await chapterRepository.createChapter(sessionId, chapter);
+    const result = await chapterRepository.createChapter(sessionId, reqBody.chapter);
     if (!result) throwBadRequestError('Error creating chapter');
     
     console.log('File successfully uploaded');
@@ -36,31 +31,25 @@ class AudioServices {
     return result;
   }
   
-  async createAudio(body, files) {
+  async createAudio(body) {
     console.log('Creating audio file and update chapter with audioId');
-    const filename = files.thumbnail[0].filename;
-
-    const { reference, genre, ...rest } = body;
-    rest.reference = helper.jsonParseValue(reference);
-    rest.genre = helper.jsonParseValue(genre);
+    const thumbnail = body.thumbnail;
     
-    const validatorResponse = audioValidators.createAudioValidator(rest);
+    const validatorResponse = audioValidators.createAudioValidator(body);
     if (validatorResponse.error) {
-      await chapterRepository.deleteFile('thumbnail', filename);
+      await chapterRepository.deleteFile(thumbnail, 'image');
       return throwBadRequestError(validatorResponse.error);
     }
 
-    rest.thumbnail = filename;
-
-    const audio = await audioRepository.createAudio(rest);
+    const audio = await audioRepository.createAudio(body);
     if (!audio) {
-      await chapterRepository.deleteFile('thumbnail', filename);
+      await chapterRepository.deleteFile(thumbnail, 'image');
       throwBadRequestError('Error creating audio');
     }
     
-    const chapter = await chapterRepository.updateChapterWithAudioId(rest.chapterId, audio.id);
+    const chapter = await chapterRepository.updateChapterWithAudioId(body.chapterId, audio.id);
     if (!chapter) {
-      await chapterRepository.deleteFile('thumbnail', filename);
+      await chapterRepository.deleteFile(thumbnail, 'image');
       await audio.deleteOne();
       throwBadRequestError('Error updating chapter with audioId');
     }
@@ -160,12 +149,12 @@ class AudioServices {
     const chapter = await chapterRepository.getChapter(audio.chapterId);
     if (chapter) {
       await Promise.allSettled(chapter.chapters.map(async (chap) => {
-        await chapterRepository.deleteFile('audio', chap?.filename);
+        await chapterRepository.deleteFile(chap?.publicId);
       }));
       await chapter.deleteOne();
     }
 
-    await chapterRepository.deleteFile('thumbnail', audio?.thumbnail);
+    await chapterRepository.deleteFile(thumbnail, 'image');
     await audio.deleteOne();
 
     return { id: audio.id };

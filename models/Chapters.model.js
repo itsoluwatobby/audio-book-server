@@ -5,6 +5,7 @@ const Episode = {
   link: { type: String },
   filename: { type: String },
   duration: { type: String },
+  publicId: { type: String, default: null },
 };
 
 const ChapterSchema = new mongoose.Schema(

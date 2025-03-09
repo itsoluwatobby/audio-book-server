@@ -5,8 +5,7 @@ class AppConfigValidator {
     const updateAppConfigSchema = Joi.object(
       {
         name: Joi.string().allow(null),
-        genre: Joi.array().min(1).items(Joi.string().required()).allow(null),
-        email: Joi.string().allow(null),
+        genres: Joi.array().min(1).items(Joi.string().required()).allow(null),
         channel: Joi.string().uri({ scheme: ['https'] }).allow(null),
       },
     );

@@ -16,11 +16,17 @@ class AppConfigRepository {
   }
 
   async editAppConfig(updatedInfo) {
-    return AppConfigModel.findOneAndUpdate(
+    const config = await AppConfigModel.findOneAndUpdate(
       { appId: config.appId },
       updatedInfo,
       { new: true },
-    )
+    );
+
+    return {
+      genres: config.genres,
+      name: config.name,
+      channel: config.channel,
+    };
   }
 }
 module.exports = new AppConfigRepository();

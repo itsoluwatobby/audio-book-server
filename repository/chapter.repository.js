@@ -1,6 +1,7 @@
 const { ChapterModel } = require("../models");
-const { throwNotFoundError, throwUnprocessableEntityError, throwServerError } = require("../utils/throwErrors");
-const fs = require('fs');
+const { throwNotFoundError, throwServerError } = require("../utils/throwErrors");
+const cloudinary = require('cloudinary');
+const config = require('../config/index');
 
 class ChapterRepository {
   async createChapter(sessionId, chapter) {
@@ -14,7 +15,7 @@ class ChapterRepository {
       }
       return ChapterModel.create({ sessionId, chapters: [chapter] });
     } catch (err) {
-      await this.deleteFile('audio', chapter.filename);
+      await this.deleteFile(chapter.publicId);
       throwServerError(err.message);
     }
   }
@@ -45,7 +46,7 @@ class ChapterRepository {
     const episode = chapter.chapters?.find((chap) => chap.id === episodeId);
     if (!episode) throwNotFoundError('Episode not found');
     
-    await this.deleteFile('audio', episode.filename);
+    await this.deleteFile(episode.publicId);
 
     return ChapterModel.findOneAndUpdate(
       { sessionId: sessionId },
@@ -54,18 +55,25 @@ class ChapterRepository {
     )
   }
 
-  async deleteFile(path, filename) {
-    if (!filename) return;
-    const filePath = `uploads/${path}/${filename}`;
-    if (!fs.existsSync(filePath)) return;
-  
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        const msg = `Error deleting chapter ${path}`;
-        throwUnprocessableEntityError(msg);
-      }
+  async deleteFile(publicId, resource_type = 'video') {
+    if (!publicId) return;
+
+    let resourceId = publicId;
+
+    if (resource_type === 'image') {
+      const values = publicId?.split('/');
+      resourceId = values[values?.length - 1]?.split('.')[0]
+    }
+
+    cloudinary.v2.config({
+      cloud_name: config.CLOUDINARY_CLOUD_NAME,
+      api_key: config.CLOUDINARY_KEY,
+      api_secret: config.CLOUDINARY_SECRET,
     });
-    console.log(`Chapter with name ${filename} removed`);
+  
+    const result = await cloudinary.v2.uploader.destroy(resourceId, { resource_type });
+    if (result.result === 'ok') return true;
+    return false;
   }
   
   async updateChapterWithAudioId(chapterId, audioId) {
