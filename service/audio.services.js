@@ -154,7 +154,7 @@ class AudioServices {
       await chapter.deleteOne();
     }
 
-    await chapterRepository.deleteFile(thumbnail, 'image');
+    await chapterRepository.deleteFile(audio.thumbnail, 'image');
     await audio.deleteOne();
 
     return { id: audio.id };
