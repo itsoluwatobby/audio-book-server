@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const http = require('http');
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
 const { CorsOption } = require('./config/corsOptions');
 const { DBConnection } = require('./config/DBConnect');
 const {
@@ -28,7 +29,16 @@ app.use(express.json());
 app.use(RequestRateLimiter);
 app.use(morgan('common'));
 app.use(cors(CorsOption));
-// app.use()
+
+app.use(helmet(
+  {
+    hsts: {
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    }
+  }
+));
 
 app.get('/health', (_, res) => {
   responseBody(
