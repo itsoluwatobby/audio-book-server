@@ -125,8 +125,25 @@ class AudioController {
       responseBody(
         {
           res,
-          statusCode: StatusCodes.ACCEPTED,
+          statusCode: StatusCodes.OK,
           message: 'Audios successfully retrieved',
+          data,
+        }
+      )
+    } catch (error) {
+      next(error)
+    }
+  }
+  
+  async getAudioRecommendations(req, res, next) {
+    try {
+      const data = await audioServices.getAudioRecommendations(req.query);
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.OK,
+          message: 'Recommended audios retrieved',
           data,
         }
       )

@@ -9,6 +9,11 @@ audioRoutes.get(
   (req, res, next) => audioController.getAudios(req, res, next),
 );
 
+audioRoutes.get(
+  '/recommendations',
+  (req, res, next) => audioController.getAudioRecommendations(req, res, next),
+);
+
 audioRoutes.post(
   '/upload',
   (req, res, next) => audioController.uploadFile(req, res, next),

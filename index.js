@@ -13,6 +13,7 @@ const {
 } = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
+const { RequestRateLimiter } = require('./middleware/rateLimiter.js');
 const { responseBody } = require('./utils/responseBody');
 const { appConfigServices } = require('./service');
 
@@ -24,6 +25,7 @@ const server = http.createServer(app);
 app.use(express.static('uploads/thumbnail'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(RequestRateLimiter);
 app.use(morgan('common'));
 app.use(cors(CorsOption));
 // app.use()
@@ -35,7 +37,8 @@ app.get('/health', (_, res) => {
       statusCode: 200,
       message: 'Server is in good health',
       data: {
-        status: true,
+        status: 'running',
+        app_name: 'Gracie Audios',
       }
     }
   );

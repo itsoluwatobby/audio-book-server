@@ -2,7 +2,7 @@ const { AudioModel } = require("../models");
 
 const initQuery = {
   isPublic: true,
-  limit: 45,
+  limit: 10,
   page: 1,
 };
 
@@ -17,6 +17,17 @@ class AudioRepository {
       rest,
       { page, limit },
     );
+    return audios;
+  }
+
+  async getAudioRecommendations() {
+    const RecentAudiosDuration = 7 * 24 * 60 * 60 * 1000;
+    const audios = await AudioModel.find(
+      {
+        isPublic: true,
+        createdAt: { $gte: new Date(new Date() - RecentAudiosDuration) },
+      },
+    ).limit(6);
     return audios;
   }
 

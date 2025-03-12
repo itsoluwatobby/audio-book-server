@@ -26,13 +26,13 @@ class AudioServices {
     const result = await chapterRepository.createChapter(sessionId, reqBody.chapter);
     if (!result) throwBadRequestError('Error creating chapter');
     
-    console.log('File successfully uploaded');
+    console.log('Book successfully uploaded');
     
     return result;
   }
   
   async createAudio(body) {
-    console.log('Creating audio file and update chapter with audioId');
+    console.log('Creating audio book and update chapter with audioId');
     const thumbnail = body.thumbnail;
     
     const validatorResponse = audioValidators.createAudioValidator(body);
@@ -61,7 +61,7 @@ class AudioServices {
   }
 
   async getAudioFile(reqBody) {
-    console.log('Getting audio file');
+    console.log('Getting audio book');
     const validatorResponse = chapterValidators.idValidator({ audioId: reqBody?.audioId }, 'audioId');
     if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
 
@@ -77,7 +77,7 @@ class AudioServices {
   }
  
   async getAudios(reqQuery) {
-    console.log('Getting audio files');
+    console.log('Getting audio books');
     const validatorResponse = audioValidators.getAudiosValidator(reqQuery);
     if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
 
@@ -85,9 +85,16 @@ class AudioServices {
 
     return audios;
   }
+  
+  async getAudioRecommendations() {
+    console.log('Getting recommended audio books');
+    const audios = await audioRepository.getAudioRecommendations();
+
+    return audios;
+  }
 
   async likeAudiobook({ audioId, ipAddress }) {
-    console.log('Liking audio file with ID - ', audioId);
+    console.log('Liking audio book with ID - ', audioId);
     const validatorResponse = chapterValidators.idValidator({ audioId }, 'audioId');
     if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
 
@@ -139,7 +146,7 @@ class AudioServices {
   }
   
   async deleteAudio(audioId) {
-    console.log('Removing audio files');
+    console.log('Removing audio books');
     const validatorResponse = chapterValidators.idValidator({ audioId }, 'audioId');
     if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
     
