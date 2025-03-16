@@ -8,7 +8,8 @@ class ChapterRepository {
     try {
       const findChapter = await this.getChapterBySessionId(sessionId)
       if (findChapter) {
-        if (!chapter.episode) chapter.episode = 1 + findChapter.chapters?.length;
+        // if (!chapter.episode) chapter.episode = 1 + findChapter.chapters?.length;
+        chapter.episode = 1 + findChapter.chapters?.length;
         findChapter.chapters.push(chapter);
         await findChapter.save();
         return findChapter;
