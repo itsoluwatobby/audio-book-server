@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { audioServices } = require("../service");
 const { responseBody } = require("../utils/responseBody");
+const requestIp = require('request-ip');
 
 class AudioController {
   async uploadFile(req, res, next) {
@@ -14,7 +15,7 @@ class AudioController {
           message: 'File successfully uploaded',
           data,
         }
-      )
+      );
     } catch (error) {
       next(error);
     }
@@ -33,7 +34,7 @@ class AudioController {
         },
       );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -55,7 +56,7 @@ class AudioController {
         },
       );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -77,12 +78,13 @@ class AudioController {
         },
       );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
   async getCurrentUser(req, res, next) {
     try {
-      const data = await audioServices.getCurrentUser(req.ip);
+      const ipAddress = requestIp.getClientIp(req) ?? "unknown"
+      const data = await audioServices.getCurrentUser(ipAddress);
 
       responseBody(
         {
@@ -92,18 +94,14 @@ class AudioController {
         },
       );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
   
   async getAudioFile(req, res, next) {
     try {
-      const data = await audioServices.getAudioFile(
-        {
-          ...req.params,
-          ipAddress: req.ip,
-        },
-      );
+      const ipAddress = requestIp.getClientIp(req) ?? "unknown";
+      const data = await audioServices.getAudioFile({ ...req.params, ipAddress });
 
       responseBody(
         {
@@ -112,9 +110,9 @@ class AudioController {
           message: 'Audio successfully retrieved',
           data,
         }
-      )
+      );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
   
@@ -129,9 +127,9 @@ class AudioController {
           message: 'Audios successfully retrieved',
           data,
         }
-      )
+      );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
   
@@ -146,9 +144,9 @@ class AudioController {
           message: 'Recommended audios retrieved',
           data,
         }
-      )
+      );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
   
@@ -163,9 +161,9 @@ class AudioController {
           message: 'Audio successfully deleted',
           data,
         }
-      )
+      );
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }
