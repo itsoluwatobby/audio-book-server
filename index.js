@@ -15,6 +15,7 @@ const {
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
 const { RequestRateLimiter } = require('./middleware/rateLimiter.js');
+const { getIpAddress } = require('./middleware/getIpAddress.js');
 const { responseBody } = require('./utils/responseBody');
 const { appConfigServices } = require('./service');
 
@@ -53,6 +54,8 @@ app.get('/health', (_, res) => {
     }
   );
 });
+
+app.use(getIpAddress);
 
 app.use('/api/v1/audio', audioRoutes);
 app.use('/api/v1/chapter', chapterRoutes);

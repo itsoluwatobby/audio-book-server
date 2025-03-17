@@ -1,7 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const { audioServices } = require("../service");
 const { responseBody } = require("../utils/responseBody");
-const requestIp = require('request-ip');
 
 class AudioController {
   async uploadFile(req, res, next) {
@@ -41,10 +40,7 @@ class AudioController {
   async rateAudio(req, res, next) {
     try {
       const data = await audioServices.rateAudio(
-        {
-          ...req.body,
-          ipAddress: req.ip,
-        },
+        { ...req.body, ipAddress: req.ipAddress },
       );
 
       responseBody(
@@ -65,7 +61,7 @@ class AudioController {
       const data = await audioServices.likeAudiobook(
         {
           ...req.params,
-          ipAddress: req.ip,
+          ipAddress: req.ipAddress,
         },
       );
 
@@ -83,8 +79,7 @@ class AudioController {
   }
   async getCurrentUser(req, res, next) {
     try {
-      const ipAddress = requestIp.getClientIp(req) ?? "unknown"
-      const data = await audioServices.getCurrentUser(ipAddress);
+      const data = await audioServices.getCurrentUser(req.ipAddress);
 
       responseBody(
         {
@@ -100,8 +95,9 @@ class AudioController {
   
   async getAudioFile(req, res, next) {
     try {
-      const ipAddress = requestIp.getClientIp(req) ?? "unknown";
-      const data = await audioServices.getAudioFile({ ...req.params, ipAddress });
+      const data = await audioServices.getAudioFile(
+        { ...req.params, ipAddress: req.ipAddress },
+      );
 
       responseBody(
         {
