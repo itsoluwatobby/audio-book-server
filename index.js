@@ -11,6 +11,7 @@ const {
   chapterRoutes,
   appConfigRoutes,
   audioRoutes,
+  adminRoutes,
 } = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
@@ -60,6 +61,7 @@ app.use(getIpAddress);
 app.use('/api/v1/audio', audioRoutes);
 app.use('/api/v1/chapter', chapterRoutes);
 app.use('/api/v1/config', appConfigRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.all('*', routeNotFound);
 app.use(errorHandler);

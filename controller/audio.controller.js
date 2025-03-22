@@ -129,9 +129,26 @@ class AudioController {
     }
   }
   
+  async getRecentAudios(req, res, next) {
+    try {
+      const data = await audioServices.getRecentAudios(req.query);
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.OK,
+          message: 'Recent audio books retrieved',
+          data,
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+  
   async getAudioRecommendations(req, res, next) {
     try {
-      const data = await audioServices.getAudioRecommendations(req.query);
+      const data = await audioServices.getAudioRecommendations(req.ipAddress);
 
       responseBody(
         {
