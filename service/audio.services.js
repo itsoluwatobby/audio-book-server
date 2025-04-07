@@ -86,9 +86,16 @@ class AudioServices {
     return audios;
   }
   
-  async getAudioRecommendations() {
+  async getRecentAudios() {
+    console.log('Getting recent audio books');
+    const audios = await audioRepository.getRecentAudios();
+
+    return audios;
+  }
+  
+  async getAudioRecommendations(ipAddress) {
     console.log('Getting recommended audio books');
-    const audios = await audioRepository.getAudioRecommendations();
+    const audios = await audioRepository.getAudioRecommendations(ipAddress);
 
     return audios;
   }
@@ -143,28 +150,6 @@ class AudioServices {
     console.log('Getting current user');
 
     return { ipAddress};
-  }
-  
-  async deleteAudio(audioId) {
-    console.log('Removing audio books');
-    const validatorResponse = chapterValidators.idValidator({ audioId }, 'audioId');
-    if (validatorResponse.error) return throwBadRequestError(validatorResponse.error);
-    
-    const audio = await audioRepository.getAudio(audioId);
-    if (!audio) throwNotFoundError('Audio not found');
-
-    const chapter = await chapterRepository.getChapter(audio.chapterId);
-    if (chapter) {
-      await Promise.allSettled(chapter.chapters.map(async (chap) => {
-        await chapterRepository.deleteFile(chap?.publicId);
-      }));
-      await chapter.deleteOne();
-    }
-
-    await chapterRepository.deleteFile(audio.thumbnail, 'image');
-    await audio.deleteOne();
-
-    return { id: audio.id };
   }
 
   async streamAudio(req, res, next) {

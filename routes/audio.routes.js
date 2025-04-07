@@ -10,6 +10,11 @@ audioRoutes.get(
 );
 
 audioRoutes.get(
+  '/recents',
+  (req, res, next) => audioController.getRecentAudios(req, res, next),
+);
+
+audioRoutes.get(
   '/recommendations',
   (req, res, next) => audioController.getAudioRecommendations(req, res, next),
 );
@@ -32,11 +37,6 @@ audioRoutes.get(
 audioRoutes.get(
   '/stream/:filename',
   (req, res, next) => audioServices.streamAudio(req, res, next),
-);
-
-audioRoutes.delete(
-  '/delete/:audioId',
-  (req, res, next) => audioController.deleteAudio(req, res, next),
 );
 
 audioRoutes.patch(

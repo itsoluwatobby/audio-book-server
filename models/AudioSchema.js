@@ -15,6 +15,7 @@ const AudioSchema = new mongoose.Schema(
     isPublic: { type: Boolean, default: true },
     likes: { type: Array, default: [] },
     rating: { type: Array, default: [] },
+    comments: { type: Array, default: [] },
     downloads: { type: Number, default: 0 },
     views: { type: Array, default: [] },
     note: { type: String, default: '' },
