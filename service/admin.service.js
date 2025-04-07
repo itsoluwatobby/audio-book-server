@@ -20,26 +20,27 @@ class AdminServices {
         likes,
         comments,
       },
-      analytics: { ...stats },
+      analytics: [...stats],
     };
   }
 
   async #getMonthlyStats() {
+    console.log('Fetch dashboard stats')
     const stats = await AudioModel.aggregate([
       // { $match: { isPublic: true } }, // Optional
       { $group: { 
           _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
-          totalViews: { $sum: { $size: '$views' } },
-          totalLikes: { $sum: { $size: '$likes' } },
-          totalComments: { $sum: { $size: '$comments' } }
+          views: { $sum: { $size: '$views' } },
+          likes: { $sum: { $size: '$likes' } },
+          comments: { $sum: { $size: '$comments' } }
         } },
       { $project: { 
           month: { $concat: [
-            { $toString: '$_id.year' }, 
+            { $toString: '$_id.year' },
             '-', 
             { $cond: { if: { $lt: ['$_id.month', 10] }, then: { $concat: ['0', { $toString: '$_id.month' }] }, else: { $toString: '$_id.month' } } }
           ] },
-          totalViews: 1, totalLikes: 1, totalComments: 1 
+          views: 1, likes: 1, comments: 1 
         } },
       { $sort: { month: 1 } }
     ]);

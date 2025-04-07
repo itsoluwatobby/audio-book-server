@@ -15,7 +15,12 @@ class AudioRepository {
     const { page, limit, ...rest } = query;
     const audios = await AudioModel.paginate(
       rest,
-      { page, limit },
+      {
+        page,
+        limit,
+        lean: true,
+        sort: { createdAt: -1 },
+      },
     );
     return audios;
   }
@@ -81,7 +86,7 @@ class AudioRepository {
   }
 
   async getTotalCounts(attribute) {
-    const result = await Audio.aggregate([
+    const result = await AudioModel.aggregate([
       // Calculate views per document
       { $project: { valueCount: { $size: `$${attribute}` } } },
       // Sum all views

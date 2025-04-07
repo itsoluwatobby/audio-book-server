@@ -13,4 +13,4 @@ const ContactUsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 ContactUsSchema.plugin(mongoosePaginate);
-module.exports = mongoose.model('audio', ContactUsSchema);
+module.exports = mongoose.model('contactus', ContactUsSchema);

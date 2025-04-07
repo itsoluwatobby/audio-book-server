@@ -12,4 +12,4 @@ const CommentsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 CommentsSchema.plugin(mongoosePaginate);
-module.exports = mongoose.model('audio', CommentsSchema);
+module.exports = mongoose.model('comments', CommentsSchema);
