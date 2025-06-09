@@ -12,6 +12,9 @@ const {
   appConfigRoutes,
   audioRoutes,
   adminRoutes,
+  commentRoutes,
+  contactUsRoutes,
+  bookRoutes,
 } = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
@@ -62,6 +65,9 @@ app.use('/api/v1/audio', audioRoutes);
 app.use('/api/v1/chapter', chapterRoutes);
 app.use('/api/v1/config', appConfigRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/comments', commentRoutes);
+app.use('/api/v1/contactUs', contactUsRoutes);
+app.use('/api/v1/books', bookRoutes);
 
 app.all('*', routeNotFound);
 app.use(errorHandler);

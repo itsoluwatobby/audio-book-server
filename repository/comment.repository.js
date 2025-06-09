@@ -6,7 +6,7 @@ const initQuery = {
 };
 
 class CommentRepository {
-  async createAudio(newComment) {
+  async createComment(newComment) {
     return Comments.create(newComment);
   }
 
@@ -18,14 +18,6 @@ class CommentRepository {
 
   async getComment(commentId) {
     return Comments.findById(commentId);
-  }
-
-  async markAsRead(commentId) {
-    return Comments.findOneAndUpdate(
-      { id: commentId },
-      { $set: { read: true } },
-      { new: true },
-    )
   }
 
   async deleteComment(commentId) {
