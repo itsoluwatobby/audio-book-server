@@ -69,7 +69,7 @@ class AudioController {
         {
           res,
           statusCode: StatusCodes.CREATED,
-          message: 'Audio successfully created',
+          message: 'Audio book successfully liked',
           data,
         },
       );
@@ -77,6 +77,7 @@ class AudioController {
       next(error);
     }
   }
+
   async getCurrentUser(req, res, next) {
     try {
       const data = await audioServices.getCurrentUser(req.ipAddress);

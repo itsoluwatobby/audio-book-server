@@ -6,13 +6,21 @@ const initQuery = {
 };
 
 class ContactUsRepository {
-  async createAudio(newContact) {
+  async createContact(newContact) {
     return ContactUs.create(newContact);
   }
 
   async getContacts(query = initQuery) {
     const { page, limit, ...rest } = query;
-    const contacts = await ContactUs.paginate(rest, { page, limit });
+    const contacts = await ContactUs.paginate(
+      rest,
+      {
+        page,
+        limit,
+        lean: true,
+        sort: { createdAt: -1 },
+      },
+    );
     return contacts;
   }
 
@@ -20,10 +28,10 @@ class ContactUsRepository {
     return ContactUs.findById(contactId);
   }
 
-  async markAsRead(contactId) {
+  async markAsResponded({ contactId, repliedTo = true }) {
     return ContactUs.findOneAndUpdate(
       { id: contactId },
-      { $set: { read: true } },
+      { $set: { repliedTo } },
       { new: true },
     )
   }

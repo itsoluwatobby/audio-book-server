@@ -1,5 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
-const { adminService } = require("../service");
+const { adminService, contactUsServices } = require("../service");
 const { responseBody } = require("../utils/responseBody");
 
 class AdminController {
@@ -45,6 +45,74 @@ class AdminController {
           res,
           statusCode: StatusCodes.CREATED,
           message: 'Audio successfully deleted',
+          data,
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async markAsResponded(req, res, next) {
+    try {
+      const data = await contactUsServices.markAsResponded(req.body);
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.CREATED,
+          message: `Contact${data.repliedTo ? '' : ' not'} marked as responded to`,
+          data,
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getContact(req, res, next) {
+    try {
+      const data = await contactUsServices.getContact(req.params);
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.OK,
+          message: 'Contact successfully retrieved',
+          data,
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getContacts(req, res, next) {
+    try {
+      const data = await contactUsServices.getContacts(req.query);
+
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.OK,
+          message: 'Contacts successfully retrieved',
+          data,
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteContact(req, res, next) {
+    try {
+      const data = await contactUsServices.deleteContact(req.params);
+      
+      responseBody(
+        {
+          res,
+          statusCode: StatusCodes.CREATED,
+          message: 'Contact successfully deleted',
           data,
         }
       );

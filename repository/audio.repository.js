@@ -80,6 +80,22 @@ class AudioRepository {
       { new: true },
     )
   }
+ 
+  async addCommentToAudio(audioId, commentId) {
+    await AudioModel.findOneAndUpdate(
+      { id: audioId },
+      { $push: { comments: commentId } },
+      { new: true },
+    )
+  }
+  
+  async removeCommentFromAudio(audioId, commentId) {
+    await AudioModel.findOneAndUpdate(
+      { id: audioId },
+      { $pull: { comments: commentId } },
+      { new: true },
+    )
+  }
 
   async deleteAudio(audioId) {
     return AudioModel.deleteOne({ id: audioId });
