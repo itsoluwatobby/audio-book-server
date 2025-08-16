@@ -18,20 +18,23 @@ class BookServices {
       const response = await axios.get(goodReadsBaseURL, {
         params: { format: "json", q: title },
       });
-      const result = response.data[0];
+      
+      const result = response.data?.map((book) => {
+        return {
+          rating: book?.avgRating,
+          ratingsCount: book?.ratingsCount,
+          author: book?.author,
+          title: book?.title,
+          description: book?.description,
+          bookTitleBare: book?.bookTitleBare,
+          rank: book?.rank,
+          numPages: book?.numPages,
+          imageUrl: book?.imageUrl,
+          source: 'goodreads'
+        };
+      });
 
-      return {
-        rating: result?.avgRating,
-        ratingsCount: result?.ratingsCount,
-        author: result?.author,
-        title: result?.title,
-        description: result?.description,
-        bookTitleBare: result?.bookTitleBare,
-        rank: result?.rank,
-        numPages: result?.numPages,
-        imageUrl: result?.imageUrl,
-        source: 'Goodreads'
-      };
+      return result;
     } catch (err) {
       throwServerError(err.message);
     }
