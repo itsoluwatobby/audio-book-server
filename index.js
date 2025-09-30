@@ -15,6 +15,7 @@ const {
   commentRoutes,
   contactUsRoutes,
   bookRoutes,
+  googleFormRoutes,
 } = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 const routeNotFound = require('./middleware/routeNotFound');
@@ -68,6 +69,7 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/contactUs', contactUsRoutes);
 app.use('/api/v1/books', bookRoutes);
+app.use('/api/v1/sheet', googleFormRoutes);
 
 app.all('*', routeNotFound);
 app.use(errorHandler);

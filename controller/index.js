@@ -5,6 +5,7 @@ const adminControllers = require('./admin.controllers');
 const commentControllers = require('./comment.controllers');
 const contactUsController = require('./contactUs.controller');
 const bookController = require('./book.controller');
+const googleFormController = require('./googleForm.controller');
 
 module.exports = {
   audioController,
@@ -14,4 +15,5 @@ module.exports = {
   commentControllers,
   contactUsController,
   bookController,
+  googleFormController,
 };

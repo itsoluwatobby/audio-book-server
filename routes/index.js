@@ -5,6 +5,7 @@ const adminRoutes = require('./admin.routes');
 const contactUsRoutes = require('./contactUs.routes');
 const commentRoutes = require('./comments.routes');
 const bookRoutes = require('./book.routes');
+const googleFormRoutes = require('./googleForm.routes');
 
 module.exports = {
   chapterRoutes,
@@ -14,4 +15,5 @@ module.exports = {
   contactUsRoutes,
   commentRoutes,
   bookRoutes,
+  googleFormRoutes,
 };

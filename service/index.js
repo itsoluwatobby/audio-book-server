@@ -5,6 +5,7 @@ const adminService = require('./admin.service');
 const commentServices = require('./comment.services');
 const contactUsServices = require('./contactUs.services');
 const bookServices = require('./book.service');
+const googleFormServices = require('./googleForm.services');
 
 module.exports = {
   chapterServices,
@@ -14,4 +15,5 @@ module.exports = {
   commentServices,
   contactUsServices,
   bookServices,
+  googleFormServices,
 };
