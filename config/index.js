@@ -11,4 +11,5 @@ module.exports = {
   CLOUDINARY_KEY: process.env.CLOUDINARY_KEY,
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   appId: process.env.appId,
+  googleSheetBaseURL: process.env.GOOGLE_SHEET,
 };

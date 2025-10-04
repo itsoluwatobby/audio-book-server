@@ -1,13 +1,12 @@
 const { default: axios } = require("axios");
+const config = require("../config/index");
 
 class GoogleFormService {
-  #BaseUrl = "https://script.google.com/macros/s/AKfycbwDA7K7u_3qNSn9JO_dGc002Al2DdM5OEERuZOXRCBZw9ewbXUVnNGcsy8FuM-nUdYIPw/exec";
-
   async submitForm (reqBody) {
     const submissionId = await this.#getLastSubmissionId();
     console.log("Submitting user data");
     const response = await axios.post(
-      this.#BaseUrl,
+      config.googleSheetBaseURL,
       { ...reqBody, cardId: submissionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -39,7 +38,7 @@ class GoogleFormService {
   
   async #fetchSubmissions() {
     const response = await axios.get(
-      this.#BaseUrl,
+      config.googleSheetBaseURL,
       {
         headers: { "Content-Type": "application/json" }
       },
