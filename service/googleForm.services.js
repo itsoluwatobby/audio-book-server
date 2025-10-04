@@ -4,16 +4,17 @@ class GoogleFormService {
   #BaseUrl = "https://script.google.com/macros/s/AKfycbwDA7K7u_3qNSn9JO_dGc002Al2DdM5OEERuZOXRCBZw9ewbXUVnNGcsy8FuM-nUdYIPw/exec";
 
   async submitForm (reqBody) {
+    const submissionId = await this.#getLastSubmissionId();
     console.log("Submitting user data");
     const response = await axios.post(
       this.#BaseUrl,
-      reqBody,
+      { ...reqBody, cardId: submissionId },
       {
         headers: { "Content-Type": "application/json" },
       },
     );
 
-    return response.data;
+    return response.data?.data;
   }
   
   async getUserSubmission (deviceId)  {
@@ -23,6 +24,17 @@ class GoogleFormService {
 
     if (data) return data;
     return null;
+  }
+  
+  async #getLastSubmissionId ()  {
+    console.log("Generating submission Id");
+    const StartingId = 301;
+    const responseObj = await this.#fetchSubmissions();
+    if (responseObj?.length) {
+      const data = responseObj[responseObj?.length - 1];
+      return data.CardId + 1;
+    }
+    return StartingId;
   }
   
   async #fetchSubmissions() {
@@ -41,18 +53,11 @@ class GoogleFormService {
     
     if (body?.length) {
       for (const props of body) {
-        responseObj.push(
-          {
-            [keys[0]]: props[0],
-            [keys[1]]: props[1],
-            [keys[2]]: props[2],
-            [keys[3]]: props[3],
-            [keys[4]]: props[4],
-            [keys[5]]: props[5],
-            [keys[6]]: props[6],
-            [keys[7]]: props[7],
-          }
-        );
+        const body = {};
+        keys.forEach((key, index) => {
+          body[key] = props[index];
+        });
+        responseObj.push(body);
       }
     }
   
