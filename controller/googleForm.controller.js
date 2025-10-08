@@ -3,7 +3,7 @@ const { googleFormServices } = require("../service");
 const { responseBody } = require("../utils/responseBody");
 
 class GoogleFormController {
-  async submitForm (req, res) {
+  async submitForm (req, res, next) {
     try {
       const data = await googleFormServices.submitForm(req.body);
       
@@ -20,7 +20,7 @@ class GoogleFormController {
     }
   }
   
-  async getUserSubmission (req, res)  {
+  async getUserSubmission (req, res, next)  {
     try {
       const data = await googleFormServices.getUserSubmission(req.params.deviceId);
       
@@ -36,7 +36,7 @@ class GoogleFormController {
     }
   }
   
-  async getSubmissions (req, res) {
+  async getSubmissions (req, res, next) {
     try {
       const data = await googleFormServices.getSubmissions(req.body, req.ipAddress);
       
