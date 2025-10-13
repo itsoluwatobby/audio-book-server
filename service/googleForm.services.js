@@ -1,19 +1,41 @@
 const { default: axios } = require("axios");
 const config = require("../config/index");
+const { throwConflictError } = require("../utils/throwErrors");
 
 class GoogleFormService {
   async submitForm (reqBody) {
-    const submissionId = await this.#getLastSubmissionId();
+    const submission = await this.#getLastSubmissionId();
     console.log("Submitting user data");
+    const duplicate = await this.#getDuplicate(reqBody.email, reqBody.phone);
+    if (duplicate) {
+      return throwConflictError("Duplicate submission");
+    }
+
+    const seats = this.generateSeats(reqBody.guests, submission.seats);
+    reqBody.seats = seats;
+    reqBody.cardId = submission.startingId;
     const response = await axios.post(
       config.googleSheetBaseURL,
-      { ...reqBody, cardId: submissionId },
+      { ...reqBody },
       {
         headers: { "Content-Type": "application/json" },
       },
     );
 
     return response.data?.data;
+  }
+
+  generateSeats(guests, prevSeats) {
+    console.log("Generating seats");
+    const seats = prevSeats?.split(",");
+    let lastSeat = +(seats?.[seats?.length - 1] || 0);
+    
+    const newSeats = []
+    Array.from({ length: guests }).forEach(() => {
+      lastSeat += 1;
+      newSeats.push(lastSeat);
+    });
+    return newSeats.join(",");
   }
   
   async getUserSubmission (deviceId)  {
@@ -25,15 +47,26 @@ class GoogleFormService {
     return null;
   }
   
+  async #getDuplicate (email, phoneNumber)  {
+    console.log("Getting duplicate submission");
+    const responseObj = await this.#fetchSubmissions();
+    if (responseObj?.length) {
+      const data = responseObj.find((sub) => sub.Email === email || sub.Phone === phoneNumber);
+      if (data) return data;
+      return null;
+    }
+    return null;
+  }
+
   async #getLastSubmissionId ()  {
     console.log("Generating submission Id");
-    const StartingId = 301;
+    const startingId = 301;
     const responseObj = await this.#fetchSubmissions();
     if (responseObj?.length) {
       const data = responseObj[responseObj?.length - 1];
-      return data.CardId + 1;
+      return{ startingId: data.CardId + 1, seats: data.Seats };
     }
-    return StartingId;
+    return { startingId, seats: "" };
   }
   
   async #fetchSubmissions() {
