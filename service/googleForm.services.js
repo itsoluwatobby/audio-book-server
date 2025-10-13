@@ -8,7 +8,7 @@ class GoogleFormService {
     console.log("Submitting user data");
     const duplicate = await this.#getDuplicate(reqBody.email, reqBody.phone);
     if (duplicate) {
-      return throwConflictError("Duplicate submission");
+      return throwConflictError(`Duplicate submission::${duplicate.DeviceFingerprint}`);
     }
 
     const seats = this.generateSeats(reqBody.guests, submission.seats);
