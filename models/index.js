@@ -3,6 +3,7 @@ const AudioModel = require("./AudioSchema");
 const AppConfigModel = require("./AppConfig");
 const ContactUs = require("./ContactUs");
 const Comments = require("./Comments");
+const RSVP = require("./RSVPSchema");
 
 module.exports = {
   ChapterModel,
@@ -10,4 +11,5 @@ module.exports = {
   AppConfigModel,
   ContactUs,
   Comments,
+  RSVP,
 }

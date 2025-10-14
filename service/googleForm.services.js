@@ -1,29 +1,30 @@
-const { default: axios } = require("axios");
-const config = require("../config/index");
-const { throwConflictError } = require("../utils/throwErrors");
+const { throwConflictError, throwNotFoundError } = require("../utils/throwErrors");
 const helper = require("../helpers/helper");
+const { rsvpRepository } = require("../repository");
+
 
 class GoogleFormService {
-  async submitForm (reqBody) {
+  async submitForm(reqBody) {
     const submission = await this.#getLastSubmissionId();
     console.log("Submitting user data");
-    const duplicate = await this.#getDuplicate(reqBody.email, reqBody.phone);
+    const duplicate = await rsvpRepository.getRsvpByQuery({ email: reqBody?.email, phone: reqBody?.phone });
     if (duplicate) {
-      return throwConflictError(`Duplicate submission__${duplicate.DeviceFingerprint}`);
+      return throwConflictError(`Duplicate submission__${duplicate.deviceFingerprint}`);
     }
 
     const seats = this.generateSeats(reqBody.guests, submission.seats);
-    reqBody.seats = helper.stringifyData(seats);
+    reqBody.seats = seats;
     reqBody.cardId = submission.id;
-    const response = await axios.post(
-      config.googleSheetBaseURL,
-      { ...reqBody },
-      {
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return rsvpRepository.create(reqBody);
+  }
 
-    return response.data?.data;
+  async updateInfo(id, reqBody) {
+    console.log("Updating user data");
+    const duplicate = await rsvpRepository.getRsvpByQuery({ _id: id });
+    if (!duplicate) {
+      return throwNotFoundError("Record not found");
+    }
+    return rsvpRepository.update(id, reqBody);
   }
 
   generateSeats(guests, prevSeats) {
@@ -39,34 +40,20 @@ class GoogleFormService {
     return newSeats;
   }
   
-  async getUserSubmission (deviceId)  {
+  async getUserSubmission(deviceId)  {
     console.log("Fetching user submission");
-    const responseObj = await this.#fetchSubmissions();
-    const data = responseObj.find((sub) => sub.DeviceFingerprint === deviceId);
-
-    if (data) return data;
-    return null;
-  }
-  
-  async #getDuplicate (email, phoneNumber)  {
-    console.log("Getting duplicate submission");
-    const responseObj = await this.#fetchSubmissions();
-    if (responseObj?.length) {
-      const data = responseObj.find((sub) => sub.Email === email || sub.Phone === phoneNumber);
-      if (data) return data;
-      return null;
-    }
-    return null;
+    const data = await rsvpRepository.findOne(deviceId);
+    if (!data) return null;
+    return data;
   }
 
-  async #getLastSubmissionId ()  {
+  async #getLastSubmissionId()  {
     console.log("Generating submission Id");
     const startingId = 301;
   
-    const responseObj = await this.#fetchSubmissions();
-    if (responseObj?.length) {
-      const data = responseObj[responseObj?.length - 1];
-      const seats = helper.jsonParseValue(data.Seats) ?? [];
+    const lastSubmission = await rsvpRepository.getLastSubmission();
+    if (lastSubmission) {
+      const seats = lastSubmission.seats;
       const lastId = +(seats?.[seats?.length - 1] || startingId);
   
       return{ id: lastId + 1, seats: `${lastId}` };
@@ -74,38 +61,16 @@ class GoogleFormService {
   
     return { id: startingId, seats: `${startingId}` };
   }
-  
-  async #fetchSubmissions() {
-    const response = await axios.get(
-      config.googleSheetBaseURL,
-      {
-        headers: { "Content-Type": "application/json" }
-      },
-    );
-    const data = response.data;
-  
-    const keys = data[0];
-    const body = data.slice(1);
-  
-    const responseObj = [];
-    
-    if (body?.length) {
-      for (const props of body) {
-        const body = {};
-        keys.forEach((key, index) => {
-          body[key] = props[index];
-        });
-        responseObj.push(body);
-      }
-    }
-  
+
+  async getSubmissions(query) {
+    console.log("Getting all submissions");
+    const responseObj = await rsvpRepository.find(query);
     return responseObj;
   }
-  
-  async getSubmissions () {
-    console.log("Getting all submissions");
-    const responseObj = await this.#fetchSubmissions()
-    return responseObj;
+
+  async deleteRsvp(id) {
+    console.log("Deleting record");
+    return rsvpRepository.deleteRsvp(id);
   }
 }
 
