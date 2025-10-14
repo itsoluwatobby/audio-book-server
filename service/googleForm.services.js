@@ -1,6 +1,7 @@
 const { default: axios } = require("axios");
 const config = require("../config/index");
 const { throwConflictError } = require("../utils/throwErrors");
+const helper = require("../helpers/helper");
 
 class GoogleFormService {
   async submitForm (reqBody) {
@@ -12,8 +13,8 @@ class GoogleFormService {
     }
 
     const seats = this.generateSeats(reqBody.guests, submission.seats);
-    reqBody.seats = seats;
-    reqBody.cardId = submission.startingId;
+    reqBody.seats = helper.stringifyData(seats);
+    reqBody.cardId = submission.id;
     const response = await axios.post(
       config.googleSheetBaseURL,
       { ...reqBody },
@@ -30,12 +31,12 @@ class GoogleFormService {
     const seats = prevSeats?.split(",");
     let lastSeat = +(seats?.[seats?.length - 1] || 0);
     
-    const newSeats = []
+    const newSeats = [];
     Array.from({ length: guests }).forEach(() => {
       lastSeat += 1;
       newSeats.push(lastSeat);
     });
-    return newSeats.join(",");
+    return newSeats;
   }
   
   async getUserSubmission (deviceId)  {
@@ -61,12 +62,17 @@ class GoogleFormService {
   async #getLastSubmissionId ()  {
     console.log("Generating submission Id");
     const startingId = 301;
+  
     const responseObj = await this.#fetchSubmissions();
     if (responseObj?.length) {
       const data = responseObj[responseObj?.length - 1];
-      return{ startingId: data.CardId + 1, seats: data.Seats };
+      const seats = helper.jsonParseValue(data.Seats) ?? [];
+      const lastId = +(seats?.[seats?.length - 1] || startingId);
+  
+      return{ id: lastId + 1, seats: `${lastId}` };
     }
-    return { startingId, seats: "" };
+  
+    return { id: startingId, seats: `${startingId}` };
   }
   
   async #fetchSubmissions() {
