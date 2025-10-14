@@ -25,7 +25,6 @@ class RSVPRepository {
       {
         page,
         limit,
-        lean: true,
         sort: { createdAt: -1 },
       },
     );
@@ -47,7 +46,7 @@ class RSVPRepository {
   }
 
   async deleteRsvp(id) {
-    return RSVP.deleteOne({ id });
+    return RSVP.deleteOne({ _id: id });
   }
 }
 module.exports = new RSVPRepository();

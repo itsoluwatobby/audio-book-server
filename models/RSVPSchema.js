@@ -7,7 +7,7 @@ const RSVPSchema = new mongoose.Schema(
     name: { type: String, default: null, trim: true },
     phone: { type: String, default: null, trim: true },
     attending: { type: String, default: "YES", trim: true },
-    quests: { type: Number, default: null },
+    guests: { type: Number, default: null },
     message: { type: String, default: null, trim: true },
     email: { type: String, default: null, trim: true },
     deviceFingerprint: { type: String, default: null, index: true },

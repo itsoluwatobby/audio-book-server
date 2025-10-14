@@ -1,6 +1,7 @@
 const { throwConflictError, throwNotFoundError } = require("../utils/throwErrors");
 const helper = require("../helpers/helper");
 const { rsvpRepository } = require("../repository");
+const { RSVP } = require("../models");
 
 
 class GoogleFormService {
