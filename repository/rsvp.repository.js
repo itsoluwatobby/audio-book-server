@@ -11,7 +11,7 @@ class RSVPRepository {
   }
 
   async update(id, updateObj) {
-    return RSVP.findOneAndDelete({ _id: id }, { $set: { ...updateObj } }, { new: true });
+    return RSVP.findOneAndUpdate({ _id: id }, { $set: { ...updateObj } }, { new: true });
   }
 
   async find(query = initQuery) {

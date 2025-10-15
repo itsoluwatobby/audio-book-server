@@ -20,9 +20,9 @@ class GoogleFormController {
     }
   }
 
-  async update(req, res, next) {
+  async updateInfo(req, res, next) {
     try {
-      const data = await googleFormServices.update(req.params.id, req.body);
+      const data = await googleFormServices.updateInfo(req.params.id, req.body);
       
       responseBody(
         {

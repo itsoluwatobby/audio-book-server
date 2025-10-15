@@ -15,7 +15,7 @@ googleFormRoutes.get(
 
 googleFormRoutes.put(
   '/update/:id',
-  (req, res, next) => googleFormController.update(req, res, next),
+  (req, res, next) => googleFormController.updateInfo(req, res, next),
 );
 
 googleFormRoutes.get(

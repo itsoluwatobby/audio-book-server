@@ -60,7 +60,7 @@ class GoogleFormService {
       return{ id: lastId + 1, seats: `${lastId}` };
     }
   
-    return { id: startingId, seats: `${startingId}` };
+    return { id: startingId, seats: `${startingId - 1}` };
   }
 
   async getSubmissions(query) {
