@@ -1,10 +1,25 @@
 const { throwConflictError, throwNotFoundError } = require("../utils/throwErrors");
 const helper = require("../helpers/helper");
 const { rsvpRepository } = require("../repository");
-const { RSVP } = require("../models");
+const axios = require("axios");
+const config = require("../config/index");
 
 
 class GoogleFormService {
+  async #uploadToSheet(reqBody) {
+    console.log("Updating google sheet as a background process");
+
+    try {
+      await axios.post(
+        config.googleSheetBaseURL,
+        { ...reqBody, seats: helper.stringifyData(reqBody.seats) },
+        { headers: { "Content-Type": "application/json" } },
+      );
+    } catch (err) {
+      console.log(err.message)
+    }
+  }
+
   async submitForm(reqBody) {
     const submission = await this.#getLastSubmissionId();
     console.log("Submitting user data");
@@ -16,6 +31,8 @@ class GoogleFormService {
     const seats = this.generateSeats(reqBody.guests, submission.seats);
     reqBody.seats = seats;
     reqBody.cardId = submission.id;
+
+    this.#uploadToSheet(reqBody);
     return rsvpRepository.create(reqBody);
   }
 
@@ -66,6 +83,7 @@ class GoogleFormService {
   async getSubmissions(query) {
     console.log("Getting all submissions");
     const responseObj = await rsvpRepository.find(query);
+
     return responseObj;
   }
 

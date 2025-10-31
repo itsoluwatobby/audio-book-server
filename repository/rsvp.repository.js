@@ -23,8 +23,8 @@ class RSVPRepository {
     const rsvps = await RSVP.paginate(
       searchQuery,
       {
-        page,
-        limit,
+        page: page ?? 1,
+        limit: limit ?? 50,
         sort: { createdAt: -1 },
       },
     );

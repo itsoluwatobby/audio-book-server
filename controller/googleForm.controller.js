@@ -55,7 +55,7 @@ class GoogleFormController {
   
   async getSubmissions (req, res, next) {
     try {
-      const data = await googleFormServices.getSubmissions(req.body, req.ipAddress);
+      const data = await googleFormServices.getSubmissions(req.query);
       
       responseBody(
         {
