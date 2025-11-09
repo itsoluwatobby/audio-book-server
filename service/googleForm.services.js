@@ -23,9 +23,12 @@ class GoogleFormService {
   async submitForm(reqBody) {
     const submission = await this.#getLastSubmissionId();
     console.log("Submitting user data");
-    const duplicate = await rsvpRepository.getRsvpByQuery({ email: reqBody?.email, phone: reqBody?.phone });
-    if (duplicate) {
-      return throwConflictError(`Duplicate submission__${duplicate.deviceFingerprint}`);
+
+    if (!config.AdminDeviceIds.includes(reqBody.deviceFingerprint)) {
+      const duplicate = await rsvpRepository.getRsvpByQuery({ email: reqBody?.email, phone: reqBody?.phone });
+      if (duplicate) {
+        return throwConflictError(`Duplicate submission__${duplicate.deviceFingerprint}`);
+      }
     }
 
     const seats = this.generateSeats(reqBody.guests, submission.seats);
