@@ -33,8 +33,15 @@ class RSVPRepository {
     return { docs, meta };
   }
 
-  async findOne(deviceFingerprint) {
-    return RSVP.findOne({ deviceFingerprint });
+  async findOne(deviceFingerprint, ipAddress) {
+    return RSVP.findOne(
+      {
+        $or: [
+          { deviceFingerprint },
+          { ip: `${deviceFingerprint}_${ipAddress}` },
+        ]
+      }
+    ).select("+ip");
   }
 
   async getRsvpByQuery(query) {

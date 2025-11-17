@@ -14,7 +14,8 @@ const RSVPSchema = new mongoose.Schema(
     cardId: { type: Number, default: null },
     fila: { type: Number, default: 0 },
     gele: { type: Number, default: 0 },
-    seats: { type: Array, default: [] }
+    seats: { type: Array, default: [] },
+    ip: { type: String, default: 'unknown', select: false },
   },
   { timestamps: true },
 );

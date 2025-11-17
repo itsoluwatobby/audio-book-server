@@ -20,7 +20,7 @@ class GoogleFormService {
     }
   }
 
-  async submitForm(reqBody) {
+  async submitForm(reqBody, ipAddress) {
     const submission = await this.#getLastSubmissionId();
     console.log("Submitting user data");
 
@@ -35,8 +35,13 @@ class GoogleFormService {
     reqBody.seats = seats;
     reqBody.cardId = submission.id;
 
-    this.#uploadToSheet(reqBody);
-    return rsvpRepository.create(reqBody);
+    if (ipAddress !== "unknown") {
+      reqBody.ip = `${reqBody.deviceFingerprint}_${ipAddress}`;
+    }
+    const data = await rsvpRepository.create(reqBody);
+    if (data) this.#uploadToSheet(reqBody);
+
+    return data;
   }
 
   async updateInfo(id, reqBody) {
@@ -61,11 +66,17 @@ class GoogleFormService {
     return newSeats;
   }
   
-  async getUserSubmission(deviceId)  {
+  async getUserSubmission(deviceId, ipAddress)  {
     console.log("Fetching user submission");
-    const data = await rsvpRepository.findOne(deviceId);
+    const data = await rsvpRepository.findOne(deviceId, ipAddress);
     if (!data) return null;
-    return data;
+  
+    if (!data?.ip && ipAddress !== "unknown") {
+      data.ip = `${deviceId}_${ipAddress}`;
+      await data.save();
+    }
+    const { ip, ...rest } = data._doc;
+    return rest;
   }
 
   async #getLastSubmissionId()  {
